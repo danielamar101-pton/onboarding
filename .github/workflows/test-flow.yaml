@@ -1,0 +1,27 @@
+name: Test secret pulling and passing
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run test on dind
+    runs-on: arss-runner-dind
+
+    steps:
+      - uses: actions/checkout@v4
+        name: checkout self
+      - name: Get test secret
+        id: get-secret
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            build/devex/damar/test-secret
+          parse-json-secrets: true
+          name-transformation: uppercase
+      - name: Extract secret
+        run: |
+          echo "SECRET=${{ env.BUILD_DEVEX_DAMAR_TEST_SECRET }}" >> $GITHUB_ENV
+          echo "Exported SECRET: $SECRET"
+          sleep 120
+    
